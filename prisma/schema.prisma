@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Origin {
+  id     String  @id @default(uuid())
+  slug   String  @unique
+  name   String
+  mangas Manga[]
+
+  @@map("origins")
+}
+
+model Genre {
+  id     String           @id @default(uuid())
+  slug   String           @unique
+  name   String
+  mangas GenresOnMangas[]
+
+  @@map("genres")
+}
+
+model Manga {
+  id         String           @id @default(uuid())
+  title      String
+  slug       String           @unique
+  sinopse    String           @db.Text
+  chapters   Chapter[]
+  genres     GenresOnMangas[]
+  origin     Origin?          @relation(fields: [origin_id], references: [id])
+  origin_id  String?
+  views      Int              @default(0)
+  image_url  String           @default("http://www.cams-it.com/wp-content/uploads/2015/05/default-placeholder-200x200.png")
+  created_at DateTime         @default(now())
+  is_manga   Boolean?         @default(true)
+  status     String           @default("ongoing")
+  author     String?
+  artist     String?
+
+  @@map("mangas")
+}
+
+model Scan {
+  id      String    @id @default(uuid())
+  slug    String    @unique
+  name    String
+  href    String?
+  Chapter Chapter[]
+
+  @@map("scans")
+}
+
+model GenresOnMangas {
+  id       String @id @default(uuid())
+  manga    Manga  @relation(fields: [manga_id], references: [id])
+  genre    Genre  @relation(fields: [genre_id], references: [id])
+  manga_id String
+  genre_id String
+
+  @@map("genres_on_mangas")
+}
+
+model Chapter {
+  id         String   @id @default(uuid())
+  title      String?
+  slug       String   @unique
+  volume     Int
+  chapter    Int
+  pages      Page[]
+  manga      Manga?   @relation(fields: [manga_id], references: [id])
+  manga_id   String?
+  views      Int
+  created_at DateTime @default(now())
+  scan       Scan?    @relation(fields: [scan_id], references: [id])
+  scan_id    String?
+
+  @@map("chapters")
+}
+
+model Page {
+  id         String   @id @default(uuid())
+  url        String   @unique
+  chapter    Chapter? @relation(fields: [chapter_id], references: [id])
+  chapter_id String?
+  file_id    String
+  file_name  String
+
+  @@map("pages")
+}
