@@ -15,6 +15,7 @@ handler.use(upload.array('imgs', 150))
 
 handler.post(async (req: NextApiRequestWithFiles, res: NextApiResponse) => {
     let { volume, chapter, manga, title, error, manga_slug, scan } = await requestValidator(req.body);
+
     if (error) {
         if (req.files) {
             req.files.forEach((file) => {
