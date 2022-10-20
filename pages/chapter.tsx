@@ -5,6 +5,7 @@ import styles from '../styles/Home.module.css'
 import prisma from '../prisma/prisma';
 import { Genre, Manga, Scan } from '@prisma/client';
 import axios, { AxiosError } from 'axios';
+import Link from 'next/link';
 
 const Chapter = ({ mangas, scans }: Props) => {
     const [chapterTitle, setChapterTitle] = useState('');
@@ -13,11 +14,12 @@ const Chapter = ({ mangas, scans }: Props) => {
     const [mangaSlug, setMangaSlug] = useState('')
     const [scan, setScan] = useState('');
     const inputRef = useRef<any>(null);
-
+    const [loading, setLoading] = useState(false);
 
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
         let data = new FormData();
         let arrayOfFiles: any = [...inputRef.current.files]
         for (let i in inputRef.current.files) {
@@ -30,9 +32,11 @@ const Chapter = ({ mangas, scans }: Props) => {
         data.append('scan', scan)
         data.append('title', chapterTitle)
 
-        let res = await axios.post("/api/chapter", data).catch(e => console.log(e));
-        if (res) {
-            alert("success!")
+        let res = await axios.post("/api/chapter", data).catch(e => { console.log(e); setLoading(false); });
+
+        if (res && res.data) {
+            setLoading(false);
+            alert("success!" + res.data.newChapter.slug)
         }
     }
 
@@ -97,8 +101,15 @@ const Chapter = ({ mangas, scans }: Props) => {
 
 
 
-                    <button className={styles.button}>Enviar</button>
+                    <button className={styles.button} disabled={loading}>Enviar</button>
                 </form>
+                <div style={{ marginTop: '40px' }}>
+                    <Link href='/' >
+                        <a>
+                            Ir para criação de manga
+                        </a>
+                    </Link>
+                </div>
             </div>
         </div>
     )
@@ -112,7 +123,7 @@ type Props = {
 export const getServerSideProps: GetServerSideProps = async () => {
     let raw = await prisma.manga.findMany({ orderBy: { title: 'asc' } });
     let mangas = JSON.parse(JSON.stringify(raw))
-    let scans = await prisma.scan.findMany({})
+    let scans = await prisma.scan.findMany({ orderBy: { name: 'asc' } })
 
     return {
         props: { mangas, scans }

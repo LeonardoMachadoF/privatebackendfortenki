@@ -5,6 +5,7 @@ import styles from '../styles/Home.module.css'
 import prisma from '../prisma/prisma';
 import { Genre } from '@prisma/client';
 import axios from 'axios';
+import Link from 'next/link';
 
 const Home = ({ genres }: Props) => {
   const [mangaTitle, setMangaTitle] = useState('');
@@ -39,7 +40,10 @@ const Home = ({ genres }: Props) => {
     data.append('author', mangaAuthor);
     data.append('artist', mangaArtist);
 
-    await axios.post("/api/manga", data)
+    let res = await axios.post("/api/manga", data)
+    if (res.data) {
+      alert("success!")
+    }
   }
 
   return (
@@ -92,7 +96,15 @@ const Home = ({ genres }: Props) => {
 
           <button className={styles.button}>Enviar</button>
         </form>
+        <div style={{ marginTop: '40px' }}>
+          <Link href='/chapter' >
+            <a>
+              Ir para upload de capítulo
+            </a>
+          </Link>
+        </div>
       </div>
+
     </div>
   )
 }
@@ -102,7 +114,7 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  let genres = await prisma.genre.findMany({});
+  let genres = await prisma.genre.findMany({ orderBy: { name: 'asc' } });
 
 
   return {
