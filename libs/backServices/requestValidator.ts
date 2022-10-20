@@ -1,7 +1,7 @@
 import prisma from '../../prisma/prisma'
 
 export const requestValidator = async (body: any) => {
-    if (!body.manga_slug || !body.volume || !body.chapter || !body.title) {
+    if (!body.manga_slug || !body.volume || !body.chapter) {
 
         return { error: 'Dados incompletos, por favor, informar manga, volume e capitulo.' }
     }
@@ -40,5 +40,8 @@ export const requestValidator = async (body: any) => {
         body.scan = { id: 'cef69916-a33d-49b8-9aa4-a8a6c1b68a9b' }
     }
 
+    if (!body.title) {
+        body.title = ''
+    }
     return body;
 }

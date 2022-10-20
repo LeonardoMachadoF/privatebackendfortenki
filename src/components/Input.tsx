@@ -14,7 +14,7 @@ export const Input = ({ type, title, value, onChange, placeholder }: Props) => {
             <label htmlFor={title} style={{ width: '130px' }}>
                 {title}
             </label>
-            <input placeholder={placeholder} required type={type} id={title} value={value} onChange={e => onChange(e.target.value)} />
+            <input placeholder={placeholder} required={title !== 'Titúlo do Capitulo'} type={type} id={title} value={value} onChange={e => onChange(e.target.value)} />
         </div>
     )
 }

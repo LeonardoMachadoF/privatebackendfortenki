@@ -31,7 +31,7 @@ handler.post(async (req: NextApiRequestWithFiles, res: NextApiResponse) => {
 
     let newChapter = await prisma.chapter.create({
         data: {
-            title: title as string,
+            title: title ? title : '',
             slug: path.split('/').join('-').split(' ').join('-') as string,
             volume: parseInt(volume),
             chapter: parseInt(chapter),
