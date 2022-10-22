@@ -37,7 +37,7 @@ const Chapter = ({ mangas, scans }: Props) => {
         if (res && res.data) {
             setLoading(false);
             setChapterTitle('');
-            setChapterChapter((state) => (state + 1));
+            setChapterChapter(parseInt(`${chapterChapter}`) + parseInt('1'));
             alert("success!" + res.data.newChapter.slug)
         }
     }
